@@ -1,32 +1,37 @@
-﻿#include <iostream>
-#include <fstream>
-#include <string>
-#include <map>
-#include <algorithm>
-
-
-using namespace std;
-
-string toLowercase(const string& str) {
-    string result = str;
-    transform(result.begin(), result.end(), result.begin(), ::tolower);
-    return result;
-}
-
 int main() {
     setlocale(LC_ALL, "ru");
     setlocale(LC_ALL, "Russian");
-    string filename = "D://9.txt";
-    ifstream file(filename);
-    map<string, int> wordCounts;
-    string word;
+    std::string filename = "D://9.txt";
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Ошибка открытия файла!" << std::endl;
+        return 1;
+    }
+
+    std::map<std::string, int> words;
+    std::string word;
     while (file >> word) {
-        word.erase(remove_if(word.begin(), word.end(), ispunct), word.end());
-        word = toLowercase(word);
-        wordCounts[word]++;
+        // удаляем знаки препинания с начала и конца слова
+        while (!word.empty() && ispunct(word.front())) {
+            word.erase(0, 1);
+        }
+        while (!word.empty() && ispunct(word.back())) {
+            word.pop_back();
+        }
+        // приводим слово к нижнему регистру
+        for (auto& c : word) {
+            c = tolower(c);
+        }
+        // добавляем слово в map
+        if (!word.empty()) {
+            words[word]++;
+        }
     }
-    for (const auto& pair : wordCounts) {
-        cout << pair.first << ": " << pair.second << endl;
+
+    // выводим список слов и количество их вхождений
+    for (const auto& pair : words) {
+        std::cout << pair.first << " - " << pair.second << std::endl;
     }
+
     return 0;
 }
